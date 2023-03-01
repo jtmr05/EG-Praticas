@@ -2,6 +2,6 @@
 
 .PHONY: clean
 clean:
-	-rm -rf parser.out
+	-rm -f parser.out
 	-rm -rf __pycache__
-	-rm -rf parsetab.py
+	-rm -f parsetab.py

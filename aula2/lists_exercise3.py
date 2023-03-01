@@ -18,8 +18,8 @@ def annotate(original : typing.Any, *ascii_escape_codes : int):
     if length == 0:
         return str(original)
 
-    prefix : str = '\033[' + str(ascii_escape_codes[0])
 
+    prefix : str = '\033[' + str(ascii_escape_codes[0])
     for i in range(1, length):
         prefix += ';' + str(ascii_escape_codes[i])
 
@@ -65,17 +65,17 @@ class ListTransformer(lark.Transformer):
         self.__sequences_sums__  = list()
 
 
-    def start(self, start):
-        print(start[0])
+    def start(self, tree):
+        print(tree[0])
         print(f"Number of elements: {annotate(self.__number_of_nodes__, 1)}")
         print(f"Mode: {annotate(self.__mode__, 1)}")
         print("Sums of each 'agora' ... 'fim' sequence: " +
               f"{annotate(self.__sequences_sums__, 1)}")
 
-    def elements(self, elements):
+    def elements(self, tree):
 
         flat_elements : list[Element] = []
-        for e in elements:
+        for e in tree:
 
             if isinstance(e, list):
                 flat_elements += e
@@ -101,44 +101,44 @@ class ListTransformer(lark.Transformer):
 
         return flat_elements
 
-    def element(self, element):
-        return element[0]
-        #return element
+    def element(self, tree):
+        return tree[0]
+        #return tree
 
-    def sequence(self, sequence):
-        return sequence
+    def sequence(self, tree):
+        return tree
 
-    def LIST_BEGIN(self, LIST_BEGIN):
+    def LIST_BEGIN(self, tree):
         return lark.Discard
 
-    def LIST_END(self, LIST_END):
+    def LIST_END(self, tree):
         return lark.Discard
 
-    def SEQUENCE_BEGIN(self, SEQUENCE_BEGIN):
+    def SEQUENCE_BEGIN(self, tree):
 
         self.__is_sequence__ = True
         self.__curr_sequence__ = list()
 
-        return str(SEQUENCE_BEGIN)
+        return str(tree)
 
-    def SEQUENCE_END(self, SEQUENCE_END):
+    def SEQUENCE_END(self, tree):
 
         self.__is_sequence__ = False
         self.__sequences_sums__.append(sum(self.__curr_sequence__))
 
-        return str(SEQUENCE_END)
+        return str(tree)
 
-    def COMMA(self, COMMA):
+    def COMMA(self, tree):
         return lark.Discard
 
-    def NUMBER(self, NUMBER):
+    def NUMBER(self, tree):
         if self.__is_sequence__:
-            self.__curr_sequence__.append(int(NUMBER))
+            self.__curr_sequence__.append(int(tree))
 
-        return int(NUMBER)
+        return int(tree)
 
-    def WORD(self, WORD):
-        return str(WORD)
+    def WORD(self, tree):
+        return str(tree)
 
 
 #### Exercício 3
@@ -166,7 +166,6 @@ def main():
 
         except lark.UnexpectedCharacters:
             print(f"test '{annotate(t, 1)}' {annotate('failed', 31, 1)}!\n", file=sys.stderr)
-
 
 
 if __name__ == '__main__':

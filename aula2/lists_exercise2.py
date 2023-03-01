@@ -83,40 +83,40 @@ VIR:","
 
 class ExampleTransformer(lark.Transformer):
 
-    __elem_sum : int
-    __max_num  : int
+    __elem_sum__ : int
+    __max_num__  : int
 
     def __init__(self):
-        self.__elem_sum = 0
-        self.__max_num = 0
+        self.__elem_sum__ = 0
+        self.__max_num__  = 0
 
-    def start(self, _):
-        print(f"sum is {self.__elem_sum} and max is {self.__max_num}")
+    def start(self, tree):
+        print(f"sum is {self.__elem_sum__} and max is {self.__max_num__}")
 
-    def elemento(self, _):
-        return _
+    def elemento(self, tree):
+        return tree
 
-    def NUMERO(self, numero):
-        self.__elem_sum += int(numero)
-        self.__max_num   = max(self.__max_num, int(numero))
-        return int(numero)
+    def NUMERO(self, tree):
+        self.__elem_sum__ += int(tree)
+        self.__max_num__   = max(self.__max_num__, int(tree))
+        return int(tree)
 
-    def PE(self, _):
+    def PE(self, tree):
         return lark.Discard
-        #return str(_)
+        #return str(tree)
 
-    def PD(self, _):
+    def PD(self, tree):
         return lark.Discard
-        #return str(_)
+        #return str(tree)
 
-    def VIR(self, _):
-        #return str(_)
+    def VIR(self, tree):
         return lark.Discard
+        #return str(tree)
 
 
 def main():
 
-    frase = "[1,23,345]"
+    phrase = "[1,23,345]"
 
     #p = lark.Lark(grammar)   #não muito bem
     p = lark.Lark(grammar1)  #recomendada
@@ -124,7 +124,7 @@ def main():
     #p = lark.Lark(grammar3)  #incorreta
     #p = lark.Lark(grammar4)   #aceitável
 
-    tree = p.parse(frase)
+    tree = p.parse(phrase)
     #print(tree.pretty())
     #for element in tree.children:
       #print(element)

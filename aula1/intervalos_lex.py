@@ -1,9 +1,8 @@
 import ply.lex
-import sys
 
 
 # List of token names.   This is always required
-tokens = ('NUM',)
+tokens = ['NUM']
 
 # Literals
 literals = ['+', '-', '[', ']', ',']
