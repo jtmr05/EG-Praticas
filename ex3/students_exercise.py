@@ -24,7 +24,7 @@ def annotate(original : typing.Any, *ascii_escape_codes : int):
 
 grammar : str = '''
 start          : students_class+
-students_class : CLASS CLASS_ID students+ "."
+students_class : CLASS CLASS_ID students "."
 students       : student (";" student)*
 student        : NAME "(" grades ")"
 grades         : GRADE ("," GRADE)*
@@ -196,10 +196,10 @@ class ClassTransformer(lark.Transformer):
         for q in self.__sql_queries__:
             print(q)
 
-    def start(self, tree):
+    def start(self, tree : lark.Tree):
         return self
 
-    def students_class(self, tree):
+    def students_class(self, tree : lark.Tree):
 
         self.__class_to_students__[self.__curr_class__] = self.__student_to_average__
         self.__student_to_average__ = dict()
@@ -209,12 +209,12 @@ class ClassTransformer(lark.Transformer):
 
         self.__html_writer__.end_class()
 
-        return tree
+        return tree : lark.Tree
 
-    def students(self, tree):
-        return tree
+    def students(self, tree : lark.Tree):
+        return tree : lark.Tree
 
-    def student(self, tree):
+    def student(self, tree : lark.Tree):
 
         if self.__curr_name__ in self.__student_to_average__:
             raise lark.GrammarError()
@@ -235,18 +235,18 @@ class ClassTransformer(lark.Transformer):
         )
         self.__sql_queries__.append(query)
 
-        return tree
+        return tree : lark.Tree
 
 
-    def grades(self, tree):
-        return tree
+    def grades(self, tree : lark.Tree):
+        return tree : lark.Tree
 
-    def CLASS(self, tree):
+    def CLASS(self, tree : lark.Tree):
         return lark.Discard
 
-    def CLASS_ID(self, tree):
+    def CLASS_ID(self, tree : lark.Tree):
 
-        class_id : str = str(tree)
+        class_id : str = str(tree : lark.Tree)
         if class_id in self.__class_to_students__:
             raise lark.GrammarError()
 
@@ -256,14 +256,14 @@ class ClassTransformer(lark.Transformer):
         return lark.Discard
 
 
-    def NAME(self, tree):
-        name : str = str(tree)
+    def NAME(self, tree : lark.Tree):
+        name : str = str(tree : lark.Tree)
         self.__curr_name__ = name
         return name
 
-    def GRADE(self, tree):
+    def GRADE(self, tree : lark.Tree):
 
-        grade : int = int(tree)
+        grade : int = int(tree : lark.Tree)
 
         if grade not in self.__grade_to_students__:
             self.__grade_to_students__[grade] = set()
