@@ -8,23 +8,23 @@ import sys
 import datetime
 import io
 
-# utility function
-def annotate(original : typing.Any, *ascii_escape_codes : int):
 
-    length : int = len(ascii_escape_codes)
+# utility function
+def annotate(original: typing.Any, *ansi_escape_codes: int):
+
+    length: int = len(ansi_escape_codes)
 
     if length == 0:
         return str(original)
 
-
-    prefix : str = '\033[' + str(ascii_escape_codes[0])
+    prefix: str = '\033[' + str(ansi_escape_codes[0])
     for i in range(1, length):
-        prefix += ';' + str(ascii_escape_codes[i])
+        prefix += ';' + str(ansi_escape_codes[i])
 
     return prefix + 'm' + str(original) + '\033[0m'
 
 
-grammar : str = '''
+grammar: str = '''
 start          : students_class+
 students_class : CLASS CLASS_ID students "."
 students       : student (";" student)*
@@ -39,28 +39,27 @@ GRADE          : /\d+/
 %ignore WS
 '''
 
+
 class ClassInterpreter(lark.visitors.Interpreter):
 
     # 1.1
-    __number_of_students__ : int
+    __number_of_students__: int
 
     # 1.2
-    __class_to_students__  : dict[str, dict[str, float]]
+    __class_to_students__: dict[str, dict[str, float]]
 
     # 1.3
-    __class_to_grades__    : dict[str, dict[int, set[str]]]
+    __class_to_grades__: dict[str, dict[int, set[str]]]
 
     # 1.4
-    __sql_queries__        : list[str]
-
+    __sql_queries__: list[str]
 
     def __init__(self):
 
         self.__number_of_students__ = 0
-        self.__class_to_students__  = dict()
-        self.__class_to_grades__    = dict()
-        self.__sql_queries__        = list()
-
+        self.__class_to_students__ = dict()
+        self.__class_to_grades__ = dict()
+        self.__sql_queries__ = list()
 
     def output_data(self):
 
@@ -74,17 +73,16 @@ class ClassInterpreter(lark.visitors.Interpreter):
 
                 md_file_handle.write(f"## Turma {class_id}\n")
 
-                list_buffer  : io.StringIO = io.StringIO()
+                list_buffer: io.StringIO = io.StringIO()
                 list_buffer.write('### Lista de alunos\n')
 
-                table_buffer : io.StringIO = io.StringIO()
+                table_buffer: io.StringIO = io.StringIO()
                 table_buffer.write('### Notas\n| Aluno | Media |\n|  --------  |  -------  |\n')
 
                 for (student, avg) in students_dict.items():
 
                     print(
-                        f"Average grade for student {annotate(student, 1)} " +
-                        f"of class {annotate(class_id, 1)}: " +
+                        f"Average grade for student {annotate(student, 1)} " + f"of class {annotate(class_id, 1)}: " +
                         f"{annotate('%.2f' % avg, 1, (32 if avg >= 9.5 else 31))}"
                     )
 
@@ -98,18 +96,17 @@ class ClassInterpreter(lark.visitors.Interpreter):
 
         for (class_id, grades_dict) in self.__class_to_grades__.items():
             for (grade, students_set) in (
-                sorted(grades_dict.items(), key = lambda e: e[0], reverse = True)
+                sorted(grades_dict.items(), key=lambda e: e[0], reverse=True)
             ):
                 print(
-                    f"Students of class {annotate(class_id, 1)} that scored " +
-                    f"{annotate(grade, 1)}: {annotate(students_set, 1)}"
+                    f"Students of class {annotate(class_id, 1)} that scored "
+                    + f"{annotate(grade, 1)}: {annotate(students_set, 1)}"
                 )
 
         for q in self.__sql_queries__:
             print(q)
 
-
-    def start(self, tree : lark.Tree):
+    def start(self, tree: lark.Tree):
 
         for sclass in tree.children:
 
@@ -118,29 +115,27 @@ class ClassInterpreter(lark.visitors.Interpreter):
                 raise lark.GrammarError()
 
             self.__class_to_students__[class_id] = students_dict
-            self.__class_to_grades__[class_id]   = grades_dict
+            self.__class_to_grades__[class_id] = grades_dict
 
-
-    def students_class(self, tree : lark.Tree):
+    def students_class(self, tree: lark.Tree):
 
         (student_to_avg, grade_to_students) = self.visit(tree.children[2])
 
         for (name, avg) in student_to_avg.items():
 
-            query : str = (f"{annotate('INSERT INTO', 36, 1)} {annotate('Resultado', 33, 1)} " +
-                f"(StudentName, Grade, Date, Class) {annotate('VALUES', 36, 1)} " +
-                f"('{name}', '{'%.2f' % avg}', '{datetime.date.today()}', " +
-                f"'{str(tree.children[1].value)}');"
-            )
+            query: str = (f"{annotate('INSERT INTO', 36, 1)} {annotate('Resultado', 33, 1)} "
+                + f"(StudentName, Grade, Date, Class) {annotate('VALUES', 36, 1)} "
+                + f"('{name}', '{'%.2f' % avg}', '{datetime.date.today()}', "
+                          + f"'{str(tree.children[1].value)}');"
+                          )
             self.__sql_queries__.append(query)
 
         return (str(tree.children[1].value), student_to_avg, grade_to_students)
 
+    def students(self, tree: lark.Tree):
 
-    def students(self, tree : lark.Tree):
-
-        student_to_avg    : dict[str, float]    = dict()
-        grade_to_students : dict[int, set[str]] = dict()
+        student_to_avg: dict[str, float] = dict()
+        grade_to_students: dict[int, set[str]] = dict()
 
         for student in tree.children:
 
@@ -148,7 +143,7 @@ class ClassInterpreter(lark.visitors.Interpreter):
             if name in student_to_avg:
                 raise lark.GrammarError()
 
-            grades_sum : int = 0
+            grades_sum: int = 0
             for g in grades_list:
                 grades_sum += g
 
@@ -161,25 +156,22 @@ class ClassInterpreter(lark.visitors.Interpreter):
 
         return (student_to_avg, grade_to_students)
 
-
-    def student(self, tree : lark.Tree):
+    def student(self, tree: lark.Tree):
 
         self.__number_of_students__ += 1
 
-        grades_list : list[int] = self.visit(tree.children[1])
+        grades_list: list[int] = self.visit(tree.children[1])
 
         return (str(tree.children[0].value), grades_list)
 
-
-    def grades(self, tree : lark.Tree):
+    def grades(self, tree: lark.Tree):
 
         return [int(g.value) for g in tree.children]
 
 
-
 def main():
 
-    tests : list[str] = [
+    tests: list[str] = [
         '''TURMA A
         ana (1, 2, 3);
         ze (2, 4);
@@ -194,15 +186,13 @@ def main():
         '''
     ]
 
-
-    parser : lark.Lark = lark.Lark(grammar)
-
+    parser: lark.Lark = lark.Lark(grammar)
 
     for t in tests:
 
         try:
-            tree : lark.ParseTree = parser.parse(t)
-            ci : ClassInterpreter = ClassInterpreter()
+            tree: lark.ParseTree = parser.parse(t)
+            ci: ClassInterpreter = ClassInterpreter()
             ci.visit(tree)
             ci.output_data()
 

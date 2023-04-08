@@ -6,17 +6,17 @@ import functools
 import sys
 
 # utility function
-def annotate(original : typing.Any, *ascii_escape_codes : int):
+def annotate(original : typing.Any, *ansi_escape_codes : int):
 
-    length : int = len(ascii_escape_codes)
+    length : int = len(ansi_escape_codes)
 
     if length == 0:
         return str(original)
 
 
-    prefix : str = '\033[' + str(ascii_escape_codes[0])
+    prefix : str = '\033[' + str(ansi_escape_codes[0])
     for i in range(1, length):
-        prefix += ';' + str(ascii_escape_codes[i])
+        prefix += ';' + str(ansi_escape_codes[i])
 
     return prefix + 'm' + str(original) + '\033[0m'
 

@@ -9,15 +9,14 @@ from intervalos_lex import tokens
 parser = None
 
 
-def print_statistics(l : list[tuple[int, int]]):
+def print_statistics(l: list[tuple[int, int]]):
 
-    size : int = len(l)
+    size: int = len(l)
 
     print()
     print(f"Number of intervals: {size}")
 
-
-    ranges : list[tuple[int, int]] = list(
+    ranges: list[tuple[int, int]] = list(
         map(
             lambda x: (x, abs(l[x][1] - l[x][0])),
             range(0, size)
@@ -34,18 +33,18 @@ def print_statistics(l : list[tuple[int, int]]):
         )
     )
 
-    def min_tuple(a : tuple[int, int], b : tuple[int, int]) -> tuple[int, int]:
+    def min_tuple(a: tuple[int, int], b: tuple[int, int]) -> tuple[int, int]:
         if a[1] > b[1]:
             return b
         return a
 
-    def max_tuple(a : tuple[int, int], b : tuple[int, int]) -> tuple[int, int]:
+    def max_tuple(a: tuple[int, int], b: tuple[int, int]) -> tuple[int, int]:
         if a[1] < b[1]:
             return b
         return a
 
-    min_ind : int = functools.reduce(min_tuple, ranges, (-1, sys.maxsize))[0]
-    max_ind : int = functools.reduce(max_tuple, ranges, (-1, 0))[0]
+    min_ind: int = functools.reduce(min_tuple, ranges, (-1, sys.maxsize))[0]
+    max_ind: int = functools.reduce(max_tuple, ranges, (-1, 0))[0]
 
     print(f"Min range interval: {l[min_ind]}")
     print(f"Max range interval: {l[max_ind]}")
@@ -60,34 +59,32 @@ def p_sequencia(p):
 
     p[0] = p[2]
 
-    cmp_str : str
-
     for i in range(0, len(p[0]) - 1):
 
         if parser.is_plus:
 
-            if p[0][i][1] >= p[0][i+1][0]:
+            if p[0][i][1] >= p[0][i + 1][0]:
 
                 parser.success = False
 
                 print(
-                    f"Syntax error: intervals {p[0][i]} and {p[0][i+1]} " +
-                    "aren't in the correct order or intercept",
-                    file = sys.stderr
+                    f"Syntax error: intervals {p[0][i]} and {p[0][i+1]} "
+                    + "aren't in the correct order or intercept",
+                    file=sys.stderr
                 )
 
                 raise SyntaxError
 
         else:
 
-            if p[0][i][1] <= p[0][i+1][0]:
+            if p[0][i][1] <= p[0][i + 1][0]:
 
                 parser.success = False
 
                 print(
-                    f"Syntax error: intervals {p[0][i]} and {p[0][i+1]} " +
-                    "aren't in the correct order or intercept",
-                    file = sys.stderr
+                    f"Syntax error: intervals {p[0][i]} and {p[0][i+1]} "
+                    + "aren't in the correct order or intercept",
+                    file=sys.stderr
                 )
 
                 raise SyntaxError
@@ -118,7 +115,7 @@ def p_intervalos_intervalos(p):
 def p_intervalo(p):
     "intervalo : '[' NUM ',' NUM ']'"
 
-    cmp_str : str = ''
+    cmp_str: str = ''
 
     if parser.is_plus:
         cmp_str = 'lesser'

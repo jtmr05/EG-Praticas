@@ -81,10 +81,11 @@ VIR:","
 %ignore WS
 '''
 
+
 class ExampleTransformer(lark.Transformer):
 
-    __elem_sum__ : int
-    __max_num__  : int
+    __elem_sum__: int
+    __max_num__: int
 
     def __init__(self):
         self.__elem_sum__ = 0
@@ -119,7 +120,7 @@ def main():
     phrase = "[1,23,345]"
 
     #p = lark.Lark(grammar)   #não muito bem
-    p = lark.Lark(grammar1)  #recomendada
+    p = lark.Lark(grammar1)  # recomendada
     #p = lark.Lark(grammar2)  #incorreta
     #p = lark.Lark(grammar3)  #incorreta
     #p = lark.Lark(grammar4)   #aceitável
@@ -127,9 +128,9 @@ def main():
     tree = p.parse(phrase)
     #print(tree.pretty())
     #for element in tree.children:
-      #print(element)
+    #print(element)
 
-    data = ExampleTransformer().transform(tree)
+    ExampleTransformer().transform(tree)
 
 
 if __name__ == '__main__':
