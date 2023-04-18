@@ -149,8 +149,6 @@ class ClassTransformer(lark.Transformer):
 
             md_file_handle.write('# Visualizador de turmas\n')
 
-            html_writer: HtmlTableWriter = HtmlTableWriter()
-
             for (students_class, students_dict) in self.__class_to_students__.items():
 
                 md_file_handle.write(f"## Turma {students_class}\n")

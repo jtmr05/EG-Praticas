@@ -5,23 +5,23 @@ import typing
 import functools
 import sys
 
-# utility function
-def annotate(original : typing.Any, *ansi_escape_codes : int):
 
-    length : int = len(ansi_escape_codes)
+# utility function
+def annotate(original: typing.Any, *ansi_escape_codes: int):
+
+    length: int = len(ansi_escape_codes)
 
     if length == 0:
         return str(original)
 
-
-    prefix : str = '\033[' + str(ansi_escape_codes[0])
+    prefix: str = '\033[' + str(ansi_escape_codes[0])
     for i in range(1, length):
         prefix += ';' + str(ansi_escape_codes[i])
 
     return prefix + 'm' + str(original) + '\033[0m'
 
 
-grammar : str = '''
+grammar: str = '''
 start          : LIST_BEGIN elements LIST_END
 elements       : element (COMMA element)*
 element        : NUMBER
@@ -39,15 +39,15 @@ WORD           : /\w+/
 
 Element = typing.Union[str, int]
 
+
 class ListTransformer(lark.Transformer):
 
-    __number_of_nodes__     : int
-    __mode__                : Element
-    __is_sequence__         : bool
-    __curr_sequence__       : list[int]
-    __sequences_sums__      : list[int]
-    __elem_to_occurrences__ : dict[Element, int]
-
+    __number_of_nodes__: int
+    __mode__: Element
+    __is_sequence__: bool
+    __curr_sequence__: list[int]
+    __sequences_sums__: list[int]
+    __elem_to_occurrences__: dict[Element, int]
 
     def __init__(self):
         self.__number_of_nodes__     = 0
@@ -57,12 +57,11 @@ class ListTransformer(lark.Transformer):
         self.__sequences_sums__      = list()
         self.__elem_to_occurrences__ = dict()
 
-    def __add_element__(self, elem : Element):
+    def __add_element__(self, elem: Element):
         if elem not in self.__elem_to_occurrences__:
             self.__elem_to_occurrences__[elem] = 1
         else:
             self.__elem_to_occurrences__[elem] += 1
-
 
     def start(self, tree):
         print(f"Number of elements: {annotate(self.__number_of_nodes__, 1)}")
@@ -74,8 +73,7 @@ class ListTransformer(lark.Transformer):
         if self.__is_sequence__:
             raise lark.GrammarError()
 
-
-        def dict_min(a : Element, b : Element) -> Element:
+        def dict_min(a: Element, b: Element) -> Element:
             if self.__elem_to_occurrences__[a] < self.__elem_to_occurrences__[b]:
                 return b
             return a
@@ -83,7 +81,6 @@ class ListTransformer(lark.Transformer):
         self.__mode__ = functools.reduce(dict_min, self.__elem_to_occurrences__)
 
         return tree
-
 
     def element(self, tree):
         return tree[0]
@@ -93,8 +90,7 @@ class ListTransformer(lark.Transformer):
         if self.__is_sequence__:
             self.__curr_sequence__.append(int(tree))
 
-
-        number : int = int(tree)
+        number: int = int(tree)
 
         self.__number_of_nodes__ += 1
 
@@ -104,7 +100,7 @@ class ListTransformer(lark.Transformer):
 
     def WORD(self, tree):
 
-        word : str = str(tree)
+        word: str = str(tree)
 
         if word == 'agora':
 
@@ -128,13 +124,11 @@ class ListTransformer(lark.Transformer):
         elif self.__is_sequence__:
             raise lark.GrammarError()
 
-
         self.__number_of_nodes__ += 1
 
         self.__add_element__(word)
 
         return word
-
 
     def LIST_BEGIN(self, tree):
         return lark.Discard
@@ -146,10 +140,10 @@ class ListTransformer(lark.Transformer):
         return lark.Discard
 
 
-#### Exercício 3
+# Exercício 3
 def main():
 
-    tests : list[str] = [
+    tests: list[str] = [
         "LISTA 1  .",
         "lIstA 1, 3, 4, 4, 4, 6, 4, 8, agora, 666, fim .",
         "lIstA agora, agora, 666, fim .",
@@ -159,13 +153,12 @@ def main():
         "Lista 1, 2, 2, 2, agora, 3, coiso, 4, fim, agora, 7, 81, 8, fim.",
     ]
 
-
-    parser : lark.Lark = lark.Lark(grammar)
+    parser: lark.Lark = lark.Lark(grammar)
 
     for t in tests:
 
         try:
-            tree : lark.ParseTree = parser.parse(t)
+            tree: lark.ParseTree = parser.parse(t)
             #print(tree.pretty())
             ListTransformer().transform(tree)
             print(f"==> Test '{annotate(t, 1)}' {annotate('passed', 32, 1)}!\n", file=sys.stderr)
