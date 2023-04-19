@@ -43,33 +43,33 @@ GRADE          : /\d+/
 class ClassInterpreter(lark.visitors.Interpreter):
 
     # 1.1
-    __number_of_students__: int
+    _number_of_students: int
 
     # 1.2
-    __class_to_students__: dict[str, dict[str, float]]
+    _class_to_students: dict[str, dict[str, float]]
 
     # 1.3
-    __class_to_grades__: dict[str, dict[int, set[str]]]
+    _class_to_grades: dict[str, dict[int, set[str]]]
 
     # 1.4
-    __sql_queries__: list[str]
+    _sql_queries: list[str]
 
     def __init__(self):
 
-        self.__number_of_students__ = 0
-        self.__class_to_students__ = dict()
-        self.__class_to_grades__ = dict()
-        self.__sql_queries__ = list()
+        self._number_of_students = 0
+        self._class_to_students = dict()
+        self._class_to_grades = dict()
+        self._sql_queries = list()
 
     def output_data(self):
 
-        print(f"Number of students: {annotate(self.__number_of_students__, 1)}")
+        print(f"Number of students: {annotate(self._number_of_students, 1)}")
 
         with open('classes.md', 'w') as md_file_handle:
 
             md_file_handle.write('# Visualizador de turmas\n')
 
-            for (class_id, students_dict) in self.__class_to_students__.items():
+            for (class_id, students_dict) in self._class_to_students.items():
 
                 md_file_handle.write(f"## Turma {class_id}\n")
 
@@ -94,7 +94,7 @@ class ClassInterpreter(lark.visitors.Interpreter):
                 md_file_handle.write(table_buffer.getvalue())
                 md_file_handle.write('\n')
 
-        for (class_id, grades_dict) in self.__class_to_grades__.items():
+        for (class_id, grades_dict) in self._class_to_grades.items():
             for (grade, students_set) in (
                 sorted(grades_dict.items(), key=lambda e: e[0], reverse=True)
             ):
@@ -103,7 +103,7 @@ class ClassInterpreter(lark.visitors.Interpreter):
                     + f"{annotate(grade, 1)}: {annotate(students_set, 1)}"
                 )
 
-        for q in self.__sql_queries__:
+        for q in self._sql_queries:
             print(q)
 
     def start(self, tree: lark.Tree):
@@ -111,11 +111,11 @@ class ClassInterpreter(lark.visitors.Interpreter):
         for sclass in tree.children:
 
             (class_id, students_dict, grades_dict) = self.visit(sclass)
-            if class_id in self.__class_to_students__ or class_id in self.__class_to_grades__:
+            if class_id in self._class_to_students or class_id in self._class_to_grades:
                 raise lark.GrammarError()
 
-            self.__class_to_students__[class_id] = students_dict
-            self.__class_to_grades__[class_id] = grades_dict
+            self._class_to_students[class_id] = students_dict
+            self._class_to_grades[class_id] = grades_dict
 
     def students_class(self, tree: lark.Tree):
 
@@ -128,7 +128,7 @@ class ClassInterpreter(lark.visitors.Interpreter):
                 + f"('{name}', '{'%.2f' % avg}', '{datetime.date.today()}', "
                           + f"'{str(tree.children[1].value)}');"
                           )
-            self.__sql_queries__.append(query)
+            self._sql_queries.append(query)
 
         return (str(tree.children[1].value), student_to_avg, grade_to_students)
 
@@ -158,7 +158,7 @@ class ClassInterpreter(lark.visitors.Interpreter):
 
     def student(self, tree: lark.Tree):
 
-        self.__number_of_students__ += 1
+        self._number_of_students += 1
 
         grades_list: list[int] = self.visit(tree.children[1])
 

@@ -46,16 +46,16 @@ DATE      : /\d\d-\d\d-\d\d\d\d/
 
 class AlbumInterpreter(lark.visitors.Interpreter):
 
-    __fig_count__:     int
-    __output_buffer__: io.StringIO
+    _fig_count:     int
+    _output_buffer: io.StringIO
 
     def __init__(self):
-        self.__fig_count__     = 0
-        self.__output_buffer__ = io.StringIO()
+        self._fig_count     = 0
+        self._output_buffer = io.StringIO()
 
     def print_output(self, fn: str):
         with open(fn, 'w') as fh:
-            fh.write(self.__output_buffer__.getvalue().strip())
+            fh.write(self._output_buffer.getvalue().strip())
 
     def album(self, tree: lark.tree.Tree):
 
@@ -69,34 +69,34 @@ class AlbumInterpreter(lark.visitors.Interpreter):
 
     def title(self, tree: lark.tree.Tree):
         value: str = tree.children[0].value.strip('"')
-        self.__output_buffer__.write(f"\\title{{{value}}}\n")
+        self._output_buffer.write(f"\\title{{{value}}}\n")
 
     def author(self, tree: lark.tree.Tree):
         value: str = tree.children[0].value.strip('"')
-        self.__output_buffer__.write(f"\\author{{{value}}}\n")
+        self._output_buffer.write(f"\\author{{{value}}}\n")
 
     def page(self, tree: lark.tree.Tree):
         self.visit(tree.children[0])
-        self.__output_buffer__.write("\n\\newpage\n\n")
+        self._output_buffer.write("\n\\newpage\n\n")
 
     def sep(self, tree: lark.tree.Tree):
         self.visit(tree.children[0])
 
     def photo(self, tree: lark.tree.Tree):
-        self.__fig_count__ += 1
+        self._fig_count += 1
 
-        self.__output_buffer__.write("\\begin{figure}[h!]\n")
-        self.__output_buffer__.write("\\centering\n")
-        self.__output_buffer__.write(
+        self._output_buffer.write("\\begin{figure}[h!]\n")
+        self._output_buffer.write("\\centering\n")
+        self._output_buffer.write(
             f"\\includegraphics[width=0.3\\textwidth]{{{tree.children[0].value}}}\n"
         )
         self.visit(tree.children[1])
-        self.__output_buffer__.write("\\end{figure}\n")
+        self._output_buffer.write("\\end{figure}\n")
 
     def caption(self, tree: lark.tree.Tree):
         value: str = tree.children[0].value.strip('"')
-        self.__output_buffer__.write(
-            f"\\caption{{\\label{{fig:fig{self.__fig_count__}}}" +
+        self._output_buffer.write(
+            f"\\caption{{\\label{{fig:fig{self._fig_count}}}" +
             f"{value}}}\n"
         )
 

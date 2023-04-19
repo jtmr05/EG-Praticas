@@ -40,12 +40,12 @@ GRADE          : /\d+/
 
 class HtmlTableWriter:
 
-    __string_buffer__: io.StringIO
-    __grades__: dict[str, [list[int]]]
+    _string_buffer: io.StringIO
+    _grades: dict[str, [list[int]]]
 
     def __init__(self):
-        self.__string_buffer__ = io.StringIO()
-        self.__grades__        = None
+        self._string_buffer = io.StringIO()
+        self._grades        = None
 
     def __enter__(self):
         self.begin()
@@ -53,103 +53,103 @@ class HtmlTableWriter:
 
     def __exit__(self, *options):
         self.end()
-        self.__dump__()
+        self._dump()
 
     def begin(self):
 
-        self.__string_buffer__.write(
+        self._string_buffer.write(
             '<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset="utf-8"/>\n'
             + '\t\t<title>Classes</title>\n\t</head>\n'
         )
 
-        self.__string_buffer__.write('\t<body>\n')
+        self._string_buffer.write('\t<body>\n')
 
     def new_class(self, nclass):
-        self.__grades__ = dict()
-        self.__string_buffer__.write(f'\t\t<h1>{nclass}</h1>\n')
+        self._grades = dict()
+        self._string_buffer.write(f'\t\t<h1>{nclass}</h1>\n')
 
     def new_student(self, student: str, grades: list[int]):
-        self.__grades__[student] = list(grades)
+        self._grades[student] = list(grades)
 
     def end_class(self):
 
-        max_num_of_grades: int = max(map(lambda e: len(e[1]), self.__grades__.items()))
+        max_num_of_grades: int = max(map(lambda e: len(e[1]), self._grades.items()))
 
-        self.__string_buffer__.write('\t\t<table>\n\t\t\t<tr>\n')
+        self._string_buffer.write('\t\t<table>\n\t\t\t<tr>\n')
 
-        self.__string_buffer__.write('\t\t\t\t<th>Nome</th>\n')
+        self._string_buffer.write('\t\t\t\t<th>Nome</th>\n')
         for i in range(1, max_num_of_grades + 1):
-            self.__string_buffer__.write(f'\t\t\t\t<th>Nota{i}</th>\n')
-        self.__string_buffer__.write('\t\t\t\t<th>Média</th>\n')
-        self.__string_buffer__.write('\t\t\t</tr>\n')
+            self._string_buffer.write(f'\t\t\t\t<th>Nota{i}</th>\n')
+        self._string_buffer.write('\t\t\t\t<th>Média</th>\n')
+        self._string_buffer.write('\t\t\t</tr>\n')
 
-        for (stu, grades) in self.__grades__.items():
-            self.__string_buffer__.write('\t\t\t<tr>\n')
+        for (stu, grades) in self._grades.items():
+            self._string_buffer.write('\t\t\t<tr>\n')
 
-            self.__string_buffer__.write(f'\t\t\t\t<td>{stu}</td>\n')
+            self._string_buffer.write(f'\t\t\t\t<td>{stu}</td>\n')
             for g in grades:
-                self.__string_buffer__.write(f'\t\t\t\t<td>{g}</td>\n')
+                self._string_buffer.write(f'\t\t\t\t<td>{g}</td>\n')
             for i in range(len(grades), max_num_of_grades):
-                self.__string_buffer__.write('\t\t\t\t<td>-</td>\n')
+                self._string_buffer.write('\t\t\t\t<td>-</td>\n')
 
             avg: float = sum(grades) / max_num_of_grades
-            self.__string_buffer__.write(f'\t\t\t\t<td>{"%.2f" % avg}</td>\n')
+            self._string_buffer.write(f'\t\t\t\t<td>{"%.2f" % avg}</td>\n')
 
-        self.__string_buffer__.write('\t\t\t</tr>\n')
-        self.__string_buffer__.write('\t\t</table>\n')
+        self._string_buffer.write('\t\t\t</tr>\n')
+        self._string_buffer.write('\t\t</table>\n')
 
     def end(self):
-        self.__string_buffer__.write('\t</body>\n</html>\n')
+        self._string_buffer.write('\t</body>\n</html>\n')
 
-    def __dump__(self):
+    def _dump(self):
         with open('classes.html', 'w') as ofh:
-            ofh.write(self.__string_buffer__.getvalue())
+            ofh.write(self._string_buffer.getvalue())
 
 
 class ClassTransformer(lark.Transformer):
 
-    __number_of_students__: int
+    _number_of_students: int
 
-    __class_to_students__: dict[str, dict[str, float]]
-    __student_to_average__: dict[str, float]
-    __curr_grades__: list[int]
+    _class_to_students: dict[str, dict[str, float]]
+    _student_to_average: dict[str, float]
+    _curr_grades: list[int]
 
-    __class_to_grades__: dict[str, dict[int, set[str]]]
-    __grade_to_students__: dict[int, set[str]]
+    _class_to_grades: dict[str, dict[int, set[str]]]
+    _grade_to_students: dict[int, set[str]]
 
-    __curr_class__: str
-    __curr_name__: str
+    _curr_class: str
+    _curr_name: str
 
-    __sql_queries__: list[str]
+    _sql_queries: list[str]
 
-    __html_writer__: HtmlTableWriter
+    _html_writer: HtmlTableWriter
 
     def __init__(self, hw: HtmlTableWriter):
-        self.__number_of_students__ = 0
+        self._number_of_students = 0
 
-        self.__class_to_students__  = dict()
-        self.__student_to_average__ = dict()
-        self.__curr_grades__        = list()
+        self._class_to_students  = dict()
+        self._student_to_average = dict()
+        self._curr_grades        = list()
 
-        self.__class_to_grades__    = dict()
-        self.__grade_to_students__  = dict()
+        self._class_to_grades    = dict()
+        self._grade_to_students  = dict()
 
-        self.__curr_class__         = None
-        self.__curr_name__          = None
+        self._curr_class         = None
+        self._curr_name          = None
 
-        self.__sql_queries__        = list()
+        self._sql_queries        = list()
 
-        self.__html_writer__        = hw
+        self._html_writer        = hw
 
     def output_data(self):
 
-        print(f"Number of students: {annotate(self.__number_of_students__, 1)}")
+        print(f"Number of students: {annotate(self._number_of_students, 1)}")
 
         with open('classes.md', 'w') as md_file_handle:
 
             md_file_handle.write('# Visualizador de turmas\n')
 
-            for (students_class, students_dict) in self.__class_to_students__.items():
+            for (students_class, students_dict) in self._class_to_students.items():
 
                 md_file_handle.write(f"## Turma {students_class}\n")
 
@@ -175,7 +175,7 @@ class ClassTransformer(lark.Transformer):
                 md_file_handle.write(table_buffer.getvalue())
                 md_file_handle.write('\n')
 
-        for (students_class, grades_dict) in self.__class_to_grades__.items():
+        for (students_class, grades_dict) in self._class_to_grades.items():
 
             for (grade, students_set) in (
                 sorted(grades_dict.items(), key=lambda e: e[0], reverse=True)
@@ -186,7 +186,7 @@ class ClassTransformer(lark.Transformer):
                     + f"{annotate(grade, 1)}: {annotate(students_set, 1)}"
                 )
 
-        for q in self.__sql_queries__:
+        for q in self._sql_queries:
             print(q)
 
     def start(self, tree: lark.Tree):
@@ -194,13 +194,13 @@ class ClassTransformer(lark.Transformer):
 
     def students_class(self, tree: lark.Tree):
 
-        self.__class_to_students__[self.__curr_class__] = self.__student_to_average__
-        self.__student_to_average__ = dict()
+        self._class_to_students[self._curr_class] = self._student_to_average
+        self._student_to_average = dict()
 
-        self.__class_to_grades__[self.__curr_class__] = self.__grade_to_students__
-        self.__grade_to_students__ = dict()
+        self._class_to_grades[self._curr_class] = self._grade_to_students
+        self._grade_to_students = dict()
 
-        self.__html_writer__.end_class()
+        self._html_writer.end_class()
 
         return tree
 
@@ -209,23 +209,23 @@ class ClassTransformer(lark.Transformer):
 
     def student(self, tree: lark.Tree):
 
-        if self.__curr_name__ in self.__student_to_average__:
+        if self._curr_name in self._student_to_average:
             raise lark.GrammarError()
 
-        self.__number_of_students__ += 1
+        self._number_of_students += 1
 
-        self.__html_writer__.new_student(self.__curr_name__, self.__curr_grades__)
+        self._html_writer.new_student(self._curr_name, self._curr_grades)
 
-        avg: float = sum(self.__curr_grades__) / len(self.__curr_grades__)
-        self.__student_to_average__[self.__curr_name__] = avg
-        self.__curr_grades__.clear()
+        avg: float = sum(self._curr_grades) / len(self._curr_grades)
+        self._student_to_average[self._curr_name] = avg
+        self._curr_grades.clear()
 
         query: str = (f"{annotate('INSERT INTO', 36, 1)} {annotate('Resultado', 33, 1)} "
                       + f"(StudentName, Grade, Date, Class) {annotate('VALUES', 36, 1)} "
-                      + f"('{self.__curr_name__}', '{'%.2f' % avg}', '{datetime.date.today()}', "
-                      + f"'{self.__curr_class__}');"
+                      + f"('{self._curr_name}', '{'%.2f' % avg}', '{datetime.date.today()}', "
+                      + f"'{self._curr_class}');"
                       )
-        self.__sql_queries__.append(query)
+        self._sql_queries.append(query)
 
         return tree
 
@@ -238,29 +238,29 @@ class ClassTransformer(lark.Transformer):
     def CLASS_ID(self, tree: lark.Tree):
 
         class_id: str = str(tree)
-        if class_id in self.__class_to_students__:
+        if class_id in self._class_to_students:
             raise lark.GrammarError()
 
-        self.__html_writer__.new_class(class_id)
+        self._html_writer.new_class(class_id)
 
-        self.__curr_class__ = class_id
+        self._curr_class = class_id
         return lark.Discard
 
     def NAME(self, tree: lark.Tree):
         name: str = str(tree)
-        self.__curr_name__ = name
+        self._curr_name = name
         return name
 
     def GRADE(self, tree: lark.Tree):
 
         grade: int = int(tree)
 
-        if grade not in self.__grade_to_students__:
-            self.__grade_to_students__[grade] = set()
+        if grade not in self._grade_to_students:
+            self._grade_to_students[grade] = set()
 
-        self.__grade_to_students__[grade].add(self.__curr_name__)
+        self._grade_to_students[grade].add(self._curr_name)
 
-        self.__curr_grades__.append(grade)
+        self._curr_grades.append(grade)
 
         return grade
 

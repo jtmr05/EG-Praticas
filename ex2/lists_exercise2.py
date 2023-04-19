@@ -84,22 +84,22 @@ VIR:","
 
 class ExampleTransformer(lark.Transformer):
 
-    __elem_sum__: int
-    __max_num__: int
+    _elem_sum: int
+    _max_sum: int
 
     def __init__(self):
-        self.__elem_sum__ = 0
-        self.__max_num__  = 0
+        self._elem_sum = 0
+        self._max_sum  = 0
 
     def start(self, tree):
-        print(f"sum is {self.__elem_sum__} and max is {self.__max_num__}")
+        print(f"sum is {self._elem_sum} and max is {self._max_sum}")
 
     def elemento(self, tree):
         return tree
 
     def NUMERO(self, tree):
-        self.__elem_sum__ += int(tree)
-        self.__max_num__   = max(self.__max_num__, int(tree))
+        self._elem_sum += int(tree)
+        self._max_sum   = max(self._max_sum, int(tree))
         return int(tree)
 
     def PE(self, tree):

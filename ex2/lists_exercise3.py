@@ -42,43 +42,43 @@ Element = typing.Union[str, int]
 
 class ListTransformer(lark.Transformer):
 
-    __number_of_nodes__: int
-    __mode__: Element
-    __is_sequence__: bool
-    __curr_sequence__: list[int]
-    __sequences_sums__: list[int]
-    __elem_to_occurrences__: dict[Element, int]
+    _number_of_nodes: int
+    _mode: Element
+    _is_sequence: bool
+    _curr_sequence: list[int]
+    _sequences_sums: list[int]
+    _elem_to_occurrences: dict[Element, int]
 
     def __init__(self):
-        self.__number_of_nodes__     = 0
-        self.__mode__                = None
-        self.__is_sequence__         = False
-        self.__curr_sequence__       = None
-        self.__sequences_sums__      = list()
-        self.__elem_to_occurrences__ = dict()
+        self._number_of_nodes     = 0
+        self._mode                = None
+        self._is_sequence         = False
+        self._curr_sequence       = None
+        self._sequences_sums      = list()
+        self._elem_to_occurrences = dict()
 
-    def __add_element__(self, elem: Element):
-        if elem not in self.__elem_to_occurrences__:
-            self.__elem_to_occurrences__[elem] = 1
+    def _add_element(self, elem: Element):
+        if elem not in self._elem_to_occurrences:
+            self._elem_to_occurrences[elem] = 1
         else:
-            self.__elem_to_occurrences__[elem] += 1
+            self._elem_to_occurrences[elem] += 1
 
     def start(self, tree):
-        print(f"Number of elements: {annotate(self.__number_of_nodes__, 1)}")
-        print(f"Mode: {annotate(self.__mode__, 1)}")
-        print(f"Sums of each 'agora' ... 'fim' sequence: {annotate(self.__sequences_sums__, 1)}")
+        print(f"Number of elements: {annotate(self._number_of_nodes, 1)}")
+        print(f"Mode: {annotate(self._mode, 1)}")
+        print(f"Sums of each 'agora' ... 'fim' sequence: {annotate(self._sequences_sums, 1)}")
 
     def elements(self, tree):
 
-        if self.__is_sequence__:
+        if self._is_sequence:
             raise lark.GrammarError()
 
         def dict_min(a: Element, b: Element) -> Element:
-            if self.__elem_to_occurrences__[a] < self.__elem_to_occurrences__[b]:
+            if self._elem_to_occurrences[a] < self._elem_to_occurrences[b]:
                 return b
             return a
 
-        self.__mode__ = functools.reduce(dict_min, self.__elem_to_occurrences__)
+        self._mode = functools.reduce(dict_min, self._elem_to_occurrences)
 
         return tree
 
@@ -87,14 +87,14 @@ class ListTransformer(lark.Transformer):
 
     def NUMBER(self, tree):
 
-        if self.__is_sequence__:
-            self.__curr_sequence__.append(int(tree))
+        if self._is_sequence:
+            self._curr_sequence.append(int(tree))
 
         number: int = int(tree)
 
-        self.__number_of_nodes__ += 1
+        self._number_of_nodes += 1
 
-        self.__add_element__(number)
+        self._add_element(number)
 
         return number
 
@@ -104,29 +104,29 @@ class ListTransformer(lark.Transformer):
 
         if word == 'agora':
 
-            if self.__is_sequence__:
+            if self._is_sequence:
                 raise lark.GrammarError()
 
             else:
-                self.__curr_sequence__ = list()
-                self.__is_sequence__ = True
+                self._curr_sequence = list()
+                self._is_sequence = True
 
         elif word == 'fim':
 
-            if not self.__is_sequence__:
+            if not self._is_sequence:
                 raise lark.GrammarError()
 
             else:
-                self.__sequences_sums__.append(sum(self.__curr_sequence__))
-                self.__curr_sequence__ = None
-                self.__is_sequence__ = False
+                self._sequences_sums.append(sum(self._curr_sequence))
+                self._curr_sequence = None
+                self._is_sequence = False
 
-        elif self.__is_sequence__:
+        elif self._is_sequence:
             raise lark.GrammarError()
 
-        self.__number_of_nodes__ += 1
+        self._number_of_nodes += 1
 
-        self.__add_element__(word)
+        self._add_element(word)
 
         return word
 
