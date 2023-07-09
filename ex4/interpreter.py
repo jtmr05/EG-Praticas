@@ -82,8 +82,9 @@ class ClassInterpreter(lark.visitors.Interpreter):
                 for (student, avg) in students_dict.items():
 
                     print(
-                        f"Average grade for student {annotate(student, 1)} " + f"of class {annotate(class_id, 1)}: " +
-                        f"{annotate('%.2f' % avg, 1, (32 if avg >= 9.5 else 31))}"
+                        f"Average grade for student {annotate(student, 1)} "
+                        + f"of class {annotate(class_id, 1)}: "
+                        + f"{annotate('%.2f' % avg, 1, (32 if avg >= 9.5 else 31))}"
                     )
 
                     list_buffer.write(f"- {student}\n")
@@ -123,11 +124,12 @@ class ClassInterpreter(lark.visitors.Interpreter):
 
         for (name, avg) in student_to_avg.items():
 
-            query: str = (f"{annotate('INSERT INTO', 36, 1)} {annotate('Resultado', 33, 1)} "
+            query: str = (
+                f"{annotate('INSERT INTO', 36, 1)} {annotate('Resultado', 33, 1)} "
                 + f"(StudentName, Grade, Date, Class) {annotate('VALUES', 36, 1)} "
                 + f"('{name}', '{'%.2f' % avg}', '{datetime.date.today()}', "
-                          + f"'{str(tree.children[1].value)}');"
-                          )
+                + f"'{str(tree.children[1].value)}');"
+            )
             self._sql_queries.append(query)
 
         return (str(tree.children[1].value), student_to_avg, grade_to_students)
